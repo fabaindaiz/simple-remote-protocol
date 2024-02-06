@@ -33,7 +33,7 @@ class AESCipher:
 class RSACipher:
 
     def __init__(self, public: adafruit_rsa.PublicKey = None):
-        if not public:
+        if public is None:
             self._public, self._private = self.generate_key()
         else:
             self._public = public
@@ -58,9 +58,3 @@ class RSACipher:
 
     def decrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.decrypt(message, self.private)
-    
-    def sign(self, message: bytes) -> bytes:
-        return adafruit_rsa.sign(message, self.private, "SHA-512")
-    
-    def verify(self, message: bytes, signature: bytes) -> str:
-        return adafruit_rsa.verify(message, signature, self.public)

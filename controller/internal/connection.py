@@ -57,13 +57,13 @@ class WiznetConnection:
         print("Connection successfully established!\n")
 
     async def supervisor(self):
-        watchdog.timeout = 10
-        watchdog.mode = WatchDogMode.RESET
+        #watchdog.timeout = 5
+        #watchdog.mode = WatchDogMode.RESET
 
         while True:
             if not self.ethernet.link_status or self.reset:
                 print("Ethernet disconnected!")
                 supervisor.reload()
 
-            watchdog.feed()
+            #watchdog.feed()
             await asyncio.sleep(1)

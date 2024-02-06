@@ -1,6 +1,6 @@
 import asyncio
 
-from internal.connection import Connection
+from internal.connection import WiznetConnection
 from firmware.protocol.command import Command
 from firmware.protocol.encode import Decoder
 from firmware.protocol.updater import Updater
@@ -9,7 +9,7 @@ from firmware.protocol.updater import Updater
 command = Command()
 
 @command.register(b"UPLOAD")
-def upload(client, data):
+def upload(client, command, data):
     try:
         for folder, name, file in Decoder.decode_files(data):
             print("UPLOAD", folder, name, len(file))
@@ -20,10 +20,9 @@ def upload(client, data):
     client.close()
 
 
-async def main(connection: Connection):
-
-    updater = Updater(connection)
-    updater.command = command
+async def main(connection: WiznetConnection):
+    updater = Updater(connection, command)
+    updater.start()
 
     while True:
         await updater.loop()

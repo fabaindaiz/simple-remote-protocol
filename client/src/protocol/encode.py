@@ -1,8 +1,7 @@
 import os
 import zlib
 
-EOF = b"\r\n\r\n"
-SEP = b"\r\n"
+from src.connection.base import SEP
 
 
 class Encoder:
@@ -27,4 +26,4 @@ class Encoder:
         start = b"FILES\r\n"
         folder = build.encode() + SEP
         bindata = SEP.join(filedata)
-        return start + folder + bindata + EOF
+        return start + folder + bindata

@@ -1,4 +1,4 @@
-from firmware.connection.base import Handler, EOF
+from src.connection.base import Handler, EOF
 
 
 class SocketHandler(Handler):
@@ -17,7 +17,7 @@ class SocketHandler(Handler):
         return data[:-len(EOF)]
     
     def send(self, data: bytes):
-        self.client.send(data + EOF)
+        self.client.sendall(data + EOF)
 
     def close(self):
         self.client.close()

@@ -1,35 +1,47 @@
+import asyncio
+import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
+
 from internal.connection import WiznetConnection
-from firmware.connection.secure import SecureConnection, SecureHandler
+from firmware.connection.secure import SecureHandler
+from firmware.connection.socket import SocketHandler
 from firmware.protocol.auth import Auth
+from firmware.protocol.command import Command
 
 
 class Updater:
 
-    def __init__(self, connection: WiznetConnection):
-        self.connection = SecureConnection(connection, self.process)
-        self.connection.callback = self.process
-        self.connection.start()
-        self._command = None
-
-    @property
-    def command(self):
-        if not self._command:
-            raise ValueError("Command not set")
-        return self._command
+    def __init__(self, connection: WiznetConnection, command: Command):
+        self.connection = connection
+        self.command = command
     
-    @command.setter
-    def command(self, value):
-        self._command = value
+    def start(self, host: tuple = (None, 8080), blocking: bool = False, listen: int = 1):
+        socket.set_interface(self.connection.ethernet)
+        self.server = socket.socket()
 
-    def process(self, client: SecureHandler):
-        authkey = client.receive()
-
-        if not Auth.check(authkey):
-            print(f"Connection closed: Invalid authkey")
-            client.send(b"Connection closed: Invalid authkey")
-            client.close()
-
-        self.command.process(client)
+        self.server.bind(host)
+        self.server.setblocking(blocking)
+        self.server.settimeout(0.05)
+        self.server.listen(listen)
+        print("Socket listening en 8080")
 
     async def loop(self):
-        await self.connection.listen()
+        while True:
+            try:
+                client, address = self.server.accept()
+                print("Connection from", address)
+
+                socket = SocketHandler(client, address)
+                client = SecureHandler(socket)
+
+                authkey = client.receive()
+                if not Auth.check(authkey):
+                    print(f"Connection closed: Invalid authkey")
+                    client.send(b"Connection closed: Invalid authkey")
+                    client.close()
+
+                # TODO: command process loop
+                self.command.process(client)
+                client.close()
+
+            except TimeoutError:
+                await asyncio.sleep(0.01)

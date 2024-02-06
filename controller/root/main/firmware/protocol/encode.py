@@ -1,7 +1,6 @@
 import zlib
 
-EOF = b"\r\n\r\n"
-SEP = b"\r\n"
+from firmware.connection.base import SEP
 
 
 class Decoder:
