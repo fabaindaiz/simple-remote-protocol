@@ -1,5 +1,5 @@
-from firmware.auth import HashAuth
-from firmware.handler import Handler
+from firmware.protocol.auth import Auth
+from firmware.network.handler import Handler
 
 SEP = b"\r\n"
 
@@ -13,7 +13,7 @@ class Command:
         data = client.receive()
 
         authkey, command, content = data.split(SEP, 2)
-        if not HashAuth.check(authkey):
+        if not Auth.check(authkey):
             print(f"Invalid authkey")
             client.send(b"Invalid authkey")
             client.close()

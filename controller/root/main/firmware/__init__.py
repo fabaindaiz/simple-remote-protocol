@@ -1,9 +1,9 @@
 import asyncio
 
 from internal.connection import Connection
-from firmware.command import Command
-from firmware.encode import Decoder
-from firmware.remote import Remote
+from firmware.protocol.command import Command
+from firmware.protocol.encode import Decoder
+from firmware.protocol.updater import Updater
 
 
 command = Command()
@@ -21,9 +21,10 @@ def upload(client, data):
 
 
 async def main(connection: Connection):
-    remote = Remote(connection)
-    remote.set_command(command)
+
+    updater = Updater(connection)
+    updater.command = command
 
     while True:
-        await remote.updater()
+        await updater.loop()
         await asyncio.sleep(1)

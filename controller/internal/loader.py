@@ -1,23 +1,23 @@
 import asyncio
 
-from internal.connection import Connection
-from internal.recovery import system_recovery
-from internal.filesystem import remount, rootspace, userspace
+from internal.connection import WiznetConnection
+import internal.filesystem as filesystem
+import internal.recovery as recovery
 
 
 def main():
     try:
-        connection = Connection()
+        connection = WiznetConnection()
         connection.connect()
 
         print("Starting controller...")
-        remount()
+        filesystem.remount()
 
-        root = rootspace()
+        root = filesystem.rootspace()
         asyncio.create_task(root(connection))
         print("Firmware loaded!")
 
-        user = userspace()
+        user = filesystem.userspace()
         asyncio.create_task(user(connection))
         print("Entrypoint loaded!")
 
@@ -26,4 +26,4 @@ def main():
 
     except Exception as exception:
         print("Exception:", exception)
-        system_recovery()
+        recovery.system_recovery()
