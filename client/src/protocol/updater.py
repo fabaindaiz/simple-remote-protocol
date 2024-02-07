@@ -5,19 +5,19 @@ from src.connection.socket import SocketHandler
 from src.connection.secure import SecureHandler
 from src.protocol.encode import Encoder
 
-HOST = ("192.168.1.220", 8080)
 
-
-def connection(auth: str):
+def connection(host: tuple, auth: str):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(HOST)
+    client.connect(host)
 
-    socket = SocketHandler(client, HOST)
-    client = SecureHandler(socket)
+    client = SocketHandler(client, host)
+    client = SecureHandler(client)
+    print("Secure connection established")
 
     client.send(auth.encode())
-    response = client.receive()
-    print("Respuesta recibida:", response.decode())
+    if client.receive() != b"AUTH OK":
+        raise ValueError("Invalid authentication")
+    print("Authentication successful")
 
     return client
 
@@ -29,14 +29,9 @@ def update_request(client: Handler, build: str):
 
         client.send(data)
         response = client.receive()
-        print("Respuesta recibida:", response.decode())
-
+        if response != b"UPLOAD OK":
+            raise ValueError("Upload failed")
+        print("Upload successful")
+    
     finally:
         client.close()
-
-if __name__ == '__main__':
-    auth = input("Ingrese la clave: ")
-    client = connection(auth)
-
-    build = "main2"
-    update_request(client, build)

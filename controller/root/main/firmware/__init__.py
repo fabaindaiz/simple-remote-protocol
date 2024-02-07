@@ -13,9 +13,9 @@ def upload(client, command, data):
     try:
         for folder, name, file in Decoder.decode_files(data):
             print("UPLOAD", folder, name, len(file))
-        client.send(b"OK")
+        client.send(b"UPLOAD OK")
     except:
-        client.send(b"ERROR")
+        client.send(b"UPLOAD ERROR")
     
     client.close()
 

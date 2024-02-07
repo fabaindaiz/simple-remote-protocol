@@ -17,7 +17,7 @@ class SocketHandler(Handler):
         return data[:-len(EOF)]
     
     def send(self, data: bytes):
-        self.client.sendall(data + EOF)
+        self.client.send(data + EOF)
 
     def close(self):
         self.client.close()

@@ -4,6 +4,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
+from src.connection.base import SEP
+
 
 class AESCipher:
 
@@ -15,7 +17,7 @@ class AESCipher:
         return self._key
 
     @staticmethod
-    def generate_key(length: int = 16) -> bytes:
+    def generate_key(length: int = 32) -> bytes:
         return os.urandom(length)
 
     def encrypt(self, message: bytes) -> tuple[bytes, bytes]:
@@ -54,23 +56,21 @@ class RSACipher:
         if not self._private:
             raise ValueError("No private key available.")
         return self._private
+    
+    def save_public(self) -> bytes:
+        # get public numbers
+        public_numbers = self.public.public_numbers()
+        n = public_numbers.n
+        e = public_numbers.e
+        return n.to_bytes(256, 'big') + SEP + e.to_bytes(4, 'big')
+    
+    def save_private(self, password: bytes) -> bytes:
+        values = self.private.private_numbers()
+        sizes = [256, 4, 256, 128, 128]
+        return SEP.join(value.to_bytes(size, 'big') for value, size in zip(values, sizes))
 
     def encrypt(self, message: bytes) -> bytes:
-        return self.public.encrypt(
-            message,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
+        return self.public.encrypt(message, padding.PKCS1v15())
 
     def decrypt(self, ciphertext: bytes) -> bytes:
-        return self.private.decrypt(
-            ciphertext,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
+        return self.private.decrypt(ciphertext, padding.PKCS1v15())

@@ -2,6 +2,8 @@ import os
 import aesio
 import adafruit_rsa
 
+from firmware.connection.base import SEP
+
 
 class AESCipher:
 
@@ -13,48 +15,47 @@ class AESCipher:
         return self._key
 
     @staticmethod
-    def generate_key(len: int = 16) -> bytes:
+    def generate_key(len: int = 32) -> bytes:
         return os.urandom(len)
 
     def encrypt(self, message: bytes) -> tuple[bytes, bytes]:
-        iv = self.generate_key()
+        iv = self.generate_key(16)
         output = bytearray(len(message))
         cipher = aesio.AES(self.key, aesio.MODE_CTR, iv)
         cipher.encrypt_into(message, output)
-        return output, iv
+        return bytes(output), iv
 
     def decrypt(self, message: bytes, iv: bytes) -> bytes:
         output = bytearray(len(message))
         cipher = aesio.AES(self.key, aesio.MODE_CTR, iv)
         cipher.decrypt_into(message, output)
-        return output
+        return bytes(output)
 
 
 class RSACipher:
 
-    def __init__(self, public: adafruit_rsa.PublicKey = None):
-        if public is None:
-            self._public, self._private = self.generate_key()
-        else:
+    def __init__(self, public: adafruit_rsa.PublicKey):
             self._public = public
-            self._private = None
     
     @property
-    def public(self) -> adafruit_rsa.PublicKey:
+    def public(self):
         return self._public
     
-    @property
-    def private(self) -> adafruit_rsa.PrivateKey:
-        if not self._private:
-            raise ValueError("No private key")
-        return self._private
+    @staticmethod
+    def load_private(private_exp: bytes) -> adafruit_rsa.PrivateKey:
+        n, e, d, p, q = private_exp.split(SEP, 4)
+        return adafruit_rsa.PrivateKey(
+            int.from_bytes(n, 'big'),
+            int.from_bytes(e, 'big'),
+            int.from_bytes(d, 'big'),
+            int.from_bytes(p, 'big'),
+            int.from_bytes(q, 'big')
+        )
     
     @staticmethod
-    def generate_key(len: int = 1024) -> tuple[adafruit_rsa.PublicKey, adafruit_rsa.PrivateKey]:
-        return adafruit_rsa.newkeys(len)
+    def load_public(public_exp: bytes) -> adafruit_rsa.PublicKey:
+        n, e = public_exp.split(SEP, 1)
+        return adafruit_rsa.PublicKey(int.from_bytes(n, 'big'), int.from_bytes(e, 'big'))
     
     def encrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.encrypt(message, self.public)
-
-    def decrypt(self, message: bytes) -> bytes:
-        return adafruit_rsa.decrypt(message, self.private)

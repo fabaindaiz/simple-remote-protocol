@@ -32,16 +32,24 @@ class Updater:
 
                 socket = SocketHandler(client, address)
                 client = SecureHandler(socket)
+                print("Secure connection established")
 
                 authkey = client.receive()
-                if not Auth.check(authkey):
+                if Auth.check(authkey):
+                    client.send(b"AUTH OK")
+                else:
                     print(f"Connection closed: Invalid authkey")
-                    client.send(b"Connection closed: Invalid authkey")
+                    client.send(b"AUTH ERROR")
                     client.close()
-
+                    return
+                    
                 # TODO: command process loop
                 self.command.process(client)
                 client.close()
 
+            except RuntimeError:
+                print("Connection closed: Client disconnected")
+                
             except TimeoutError:
                 await asyncio.sleep(0.01)
+            
