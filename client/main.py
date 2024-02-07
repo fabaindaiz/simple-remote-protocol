@@ -1,9 +1,11 @@
+from getpass import getpass
+
 from src.protocol.updater import connection, update_request
 
 BUILD = "main2"
 HOST = ("192.168.1.220", 8080)
 
-auth = input("Ingrese la clave: ")
-client = connection(HOST, auth)
 
+password = getpass()
+client = connection(HOST, password)
 update_request(client, BUILD)

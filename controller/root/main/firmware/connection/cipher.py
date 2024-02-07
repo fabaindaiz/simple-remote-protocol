@@ -1,6 +1,7 @@
 import os
 import aesio
 import adafruit_rsa
+import circuitpython_hmac as hmac
 
 from firmware.connection.base import SEP
 
@@ -59,3 +60,24 @@ class RSACipher:
     
     def encrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.encrypt(message, self.public)
+
+
+class HMACCipher:
+
+    def __init__(self, key: bytes = None):
+        self._key = key or self.generate_key()
+
+    @property
+    def key(self) -> bytes:
+        return self._key
+
+    @staticmethod
+    def generate_key(len: int = 32) -> bytes:
+        return os.urandom(len)
+    
+    def sign(self, message: bytes) -> bytes:
+        return hmac.new(self.key, message).digest()
+
+    def verify(self, message: bytes, signature: bytes) -> bool:
+        return signature == self.sign(message)
+    

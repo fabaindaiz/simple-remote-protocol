@@ -1,6 +1,8 @@
 from firmware.connection.base import Handler, SEP
 
 
+class SessionEnd(Exception): ...
+
 class Command:
 
     def __init__(self) -> None:
@@ -13,13 +15,14 @@ class Command:
             self.commands[command] = func
             return func
         return wrapper
-    
+
     def process(self, client: Handler):
-        data = client.receive()
-        command, content = data.split(SEP, 1)
-        
-        func = self.commands.get(command, not_found)
-        func(client, command, content)
+        while True:
+            data = client.receive()
+            command, content = data.split(SEP, 1)
+            
+            func = self.commands.get(command, not_found)
+            func(client, command, content)
 
 
 def not_found(client: Handler, command: bytes, content: bytes):

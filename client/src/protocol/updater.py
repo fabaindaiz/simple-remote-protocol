@@ -1,8 +1,8 @@
 import socket
 
 from src.connection.base import Handler, SEP
+from src.connection.secure import SecureHandler, SecurityException
 from src.connection.socket import SocketHandler
-from src.connection.secure import SecureHandler
 from src.protocol.encode import Encoder
 
 
@@ -16,7 +16,7 @@ def connection(host: tuple, auth: str):
 
     client.send(auth.encode())
     if client.receive() != b"AUTH OK":
-        raise ValueError("Invalid authentication")
+        raise SecurityException("Invalid authentication")
     print("Authentication successful")
 
     return client
@@ -34,4 +34,5 @@ def update_request(client: Handler, build: str):
         print("Upload successful")
     
     finally:
+        print("Connection closed")
         client.close()

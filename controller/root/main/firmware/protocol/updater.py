@@ -2,10 +2,10 @@ import asyncio
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
 
 from internal.connection import WiznetConnection
-from firmware.connection.secure import SecureHandler
+from firmware.connection.secure import SecureHandler, SecurityException
 from firmware.connection.socket import SocketHandler
 from firmware.protocol.auth import Auth
-from firmware.protocol.command import Command
+from firmware.protocol.command import Command, SessionEnd
 
 
 class Updater:
@@ -27,29 +27,38 @@ class Updater:
     async def loop(self):
         while True:
             try:
-                client, address = self.server.accept()
+                socket, address = self.server.accept()
                 print("Connection from", address)
 
-                socket = SocketHandler(client, address)
+                asyncio.create_task(self.process(socket, address))
+            
+            except TimeoutError:
+                await asyncio.sleep(0.01)
+    
+    async def process(self, connection, address):
+        try:
+            try:
+                socket = SocketHandler(connection, address)
                 client = SecureHandler(socket)
                 print("Secure connection established")
 
                 authkey = client.receive()
                 if Auth.check(authkey):
                     client.send(b"AUTH OK")
+                    print("Authentification success")
                 else:
-                    print(f"Connection closed: Invalid authkey")
                     client.send(b"AUTH ERROR")
-                    client.close()
-                    return
-                    
-                # TODO: command process loop
-                self.command.process(client)
-                client.close()
-
-            except RuntimeError:
-                print("Connection closed: Client disconnected")
+                    raise SecurityException("Invalid authkey")
                 
-            except TimeoutError:
-                await asyncio.sleep(0.01)
+                self.command.process(client)
             
+            except SessionEnd:
+                print("Connection closed: Session ended")
+            except SecurityException as e:
+                print("Connection closed:", e)
+            finally:
+                client.close()
+        
+        except RuntimeError:
+            print("Connection closed: Client disconnected")
+        

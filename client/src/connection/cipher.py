@@ -1,6 +1,6 @@
 import os
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives import hashes, hmac, serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
@@ -74,3 +74,31 @@ class RSACipher:
 
     def decrypt(self, ciphertext: bytes) -> bytes:
         return self.private.decrypt(ciphertext, padding.PKCS1v15())
+
+
+class HMACCipher:
+
+    def __init__(self, key: bytes = None):
+        self._key = key or self.generate_key()
+
+    @property
+    def key(self) -> bytes:
+        return self._key
+
+    @staticmethod
+    def generate_key(length: int = 32) -> bytes:
+        return os.urandom(length)
+    
+    def sign(self, message: bytes) -> bytes:
+        h = hmac.HMAC(self.key, hashes.SHA256())
+        h.update(message)
+        return h.finalize()
+
+    def verify(self, message: bytes, signature: bytes) -> bool:
+        h = hmac.HMAC(self.key, hashes.SHA256())
+        h.update(message)
+        try:
+            h.verify(signature)
+            return True
+        except:
+            return False
