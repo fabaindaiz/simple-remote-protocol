@@ -1,11 +1,12 @@
 from src.protocol.updater import Connection, Request
 
-BUILD = "main2"
+SPACE = "user"
+BUILD = "second"
 HOST = ("192.168.1.220", 8080)
 
 
 if __name__ == "__main__":
     client = Connection.connect(HOST)
 
-    #Request.update(client, BUILD)
+    #Request.update(client, SPACE, BUILD)
     Request.shell(client)

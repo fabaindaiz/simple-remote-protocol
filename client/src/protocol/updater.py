@@ -32,10 +32,11 @@ class Connection:
 class Request:
 
     @staticmethod
-    def update(client: Handler, build: str):
+    def update(client: Handler, space: str, build: str):
         try:
-            command = b"userspace upload "
-            content = Encoder.encode_files(build)
+            command = b"upload "
+            content = Encoder.encode_files(space, build)
+            print("Uploading files...")
             data = command + content
 
             client.send(data)

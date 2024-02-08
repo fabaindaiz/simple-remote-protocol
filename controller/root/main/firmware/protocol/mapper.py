@@ -1,4 +1,4 @@
-from firmware.connection.base import SEP, Handler
+from firmware.connection.base import Handler
 from firmware.protocol.base import Context, CommandError
 
 
@@ -39,12 +39,13 @@ class CommandMapper:
 
         if len(args) == 1:
             command = data
-            content = b""
+            args = []
         else:
             command, content = data.split(b" ", 1)
+            args = [arg for arg in content.split(b" ")]
         
         if command not in self.commands:
             raise CommandError(f"Command {command.decode()} not found")
 
         func = self.commands.get(command)
-        func(client, command, content)
+        func(client, command, args)

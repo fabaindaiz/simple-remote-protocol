@@ -7,11 +7,7 @@ from firmware.connection.base import SEP, SecurityError
 class HMACSigner:
 
     def __init__(self, key: bytes = None):
-        self._key = key or self.generate_key()
-
-    @property
-    def key(self) -> bytes:
-        return self._key
+        self.key = key or self.generate_key()
 
     @staticmethod
     def generate_key(len: int = 32) -> bytes:

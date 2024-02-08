@@ -41,7 +41,7 @@ class RemoteSession:
             print("Connection closed: Session start timeout")
     
     async def loop(self, client: Handler, context: Context):
-        client.settimeout(0.05)
+        client.settimeout(0.1)
         os.chdir("/")
 
         while True:
@@ -51,4 +51,4 @@ class RemoteSession:
             except CommandError as e:
                 response(client, f"Command error: {e}")
             except TimeoutError:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.5)

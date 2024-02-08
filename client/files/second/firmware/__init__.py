@@ -1,4 +1,4 @@
-import _asyncio
+import asyncio
 
 from internal.connection import WiznetConnection
 from firmware.protocol.mapper import CommandMapper
@@ -21,4 +21,4 @@ async def main(connection: WiznetConnection):
 
     while True:
         await server.loop()
-        await _asyncio.sleep(1)
+        await asyncio.sleep(1)

@@ -18,3 +18,13 @@ class Context:
 def response(client: Handler, message: str):
     client.send(message.encode())
     print(message)
+
+def handleException(exception, throw):
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except exception as e:
+                raise throw(e)
+        return inner
+    return wrapper

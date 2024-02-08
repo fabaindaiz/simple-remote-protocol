@@ -18,7 +18,7 @@ class AESCipher:
     def generate_key(len: int = 32) -> bytes:
         return os.urandom(len)
 
-    #@handleException(SecurityError("AES encryption failed"))
+    @handleException(SecurityError("AES encryption failed"))
     def encrypt(self, message: bytes) -> tuple[bytes, bytes]:
         iv = self.generate_key(16)
         output = bytearray(len(message))

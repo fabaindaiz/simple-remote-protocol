@@ -10,8 +10,7 @@ from firmware.protocol.mapper import Router
 router = Router()
 
 @router.register(b"rootspace")
-def rootspace(client: Handler, command: bytes, data: bytes):
-    args = data.split(b" ")
+def rootspace(client: Handler, command: bytes, args: list[bytes]):
     if len(args) == 1:
         inst = args[0]
         if inst == b"list":
@@ -22,9 +21,7 @@ def rootspace(client: Handler, command: bytes, data: bytes):
     
     elif len(args) == 2:
         inst, path = args
-        if inst == b"upload":
-            upload(client, command, path)
-        elif inst == b"change":
+        if inst == b"change":
             change_rootspace(path.decode())
             client.send(b"rootspace changed")
         elif inst == b"delete":
@@ -39,8 +36,7 @@ def rootspace(client: Handler, command: bytes, data: bytes):
         raise CommandError("Invalid rootspace command")
 
 @router.register(b"userspace")
-def userspace(client: Handler, command: bytes, data: bytes):
-    args = data.split(b" ")
+def userspace(client: Handler, command: bytes, args: list[bytes]):
     if len(args) == 1:
         inst = args[0]
         if inst == b"list":
@@ -51,12 +47,10 @@ def userspace(client: Handler, command: bytes, data: bytes):
     
     elif len(args) == 2:
         inst, path = args
-        if inst == b"upload":
-            upload(client, command, path)
-        elif inst == b"change":
+        if inst == b"change":
             change_userspace(path.decode())
             client.send(b"userspace changed")
-        elif inst == b"delete":
+        if inst == b"delete":
             if path in os.listdir("/user") and path not in ["boot", "main"]:
                 os.rmdir(f"/user/{path}")
                 client.send(b"userspace deleted")
@@ -68,38 +62,44 @@ def userspace(client: Handler, command: bytes, data: bytes):
     else:
         raise CommandError("Invalid userspace command")
 
-
-def upload(client: Handler, command: bytes, data: bytes):
-    try:
-        folder, content = data.split(SEP, 1)
+@router.register(b"upload")
+def upload(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 3:
+        space, build, content = args
         files = content.split(SEP)
 
+        if not space in [b"root", b"user"]:
+            raise CommandError("Invalid file format")
+
         for file in files:
-            decoded = FileData.decode_files(folder, file)
-            decoded.save_file()
+            decoded = FileData.decode_files(file)
+            decoded.save_file(space)
         
         client.send(b"files uploaded")
-    except:
-        raise CommandError("upload bad format")
+    else:
+        raise CommandError("Invalid parameters")
 
 
 class FileData:
 
-    def __init__(self, name: bytes, path: bytes, content: bytes):
-        self.name = name.decode()
+    def __init__(self, path: bytes, name: bytes, content: bytes):
         self.path = path.decode()
+        self.name = name.decode()
         self.content = content
 
     @staticmethod
-    def decode_files(path: bytes, file: bytes):
-        data = bytes(zlib.decompress(file))
-        name, content = data.split(b"\r\n", 1)
-        return FileData(name, path, content)
-
-    def save_file(self):
+    def decode_files(file: bytes):
         try:
-            with open(f"{self.path}/{self.name}", "wb") as file:
+            data = bytes(zlib.decompress(file))
+            path, name, content = data.split(b"\r\n", 2)
+            return FileData(path, name, content)
+        except Exception as e:
+            raise CommandError("Invalid file format")
+
+    def save_file(self, space: str):
+        try:
+            with open(f"/{space}/{self.name}", "wb") as file:
                 file.write(self.content)
-        except:
-            pass
-        print("file", self.path, self.name, len(self.content))
+        except Exception as e:
+            print(e)
+        print("file", self.name, len(self.content))

@@ -9,25 +9,22 @@ Microcontroller firmware is used to communicate with the computer. It receives r
 
 This project runs on [CircuitPython](https://circuitpython.org/), so you will need a board that supports it. The board used in this project is the [W5500-EVB-Pico](https://circuitpython.org/board/wiznet_w5500_evb_pico/).
 
-You will also need to install the following libraries in your board:
+Libraries used in this project are ram consuming, so you will need a board with at least 256KB of RAM. Consider using a custom build of CircuitPython with the libraries built-in as frozen modules to reduce the RAM usage.
 
-#### Libraries included in the CircuitPython bundle
-- [adafruit_bus_device]()
-- [adafruit_hashlib]()
-- [adafruit_io]()
-- [adafruit_itertools]()
-- [adafruit_minimqtt]()
-- [adafruit_rsa]()
-- [adafruit_wiznet5k]()
-- [asyncio]()
-- [adafruit_binascii]()
-- [adafruit_dht]()
-- [adafruit_logging]()
-- [adafruit_requests]()
-- [adafruit_ticks]()
+You will also need to install the following libraries in your board, for more details see the LIB.md file:
 
-#### Libraries not included in the CircuitPython bundle
-- [circuitpython_hmac](https://github.com/jimbobbennett/CircuitPython_HMAC)
+- adafruit_bus_device
+- adafruit_hashlib
+- adafruit_io
+- adafruit_minimqtt
+- adafruit_rsa
+- adafruit_wiznet5k
+- asyncio
+- adafruit_binascii
+- adafruit_logging
+- adafruit_requests
+- adafruit_ticks
+- circuitpython_hmac
 
 ## Computer
 

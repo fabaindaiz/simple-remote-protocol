@@ -5,8 +5,6 @@ import digitalio
 import supervisor
 import time
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
-from microcontroller import watchdog
-from watchdog import WatchDogMode
 
 from internal.config import IP_ADDRESS, SUBNET_MASK, GATEWAY_ADDRESS, DNS_SERVER
 
@@ -58,13 +56,10 @@ class WiznetConnection:
         print("Connection successfully established!\n")
 
     async def supervisor(self):
-        #watchdog.timeout = 5
-        #watchdog.mode = WatchDogMode.RESET
 
         while True:
             if not self.ethernet.link_status or self.reset:
                 print("Ethernet disconnected!")
                 supervisor.reload()
 
-            #watchdog.feed()
             await asyncio.sleep(1)

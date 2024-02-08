@@ -1,56 +1,101 @@
 import os
 
-from firmware.connection.base import Handler, SEP
-from firmware.protocol.base import CommandError
+from firmware.connection.base import SEP, Handler
+from firmware.protocol.base import CommandError, handleException
 from firmware.protocol.mapper import Router
 
 
 router = Router()
 
-@router.register(b"storage")
-def storage(client: Handler, command: bytes, data: bytes):
-    try:
-        args = data.split(b" ")
-        if len(args) == 1:
-            inst = args[0]
-            if inst == b"cd":
-                os.chdir("/")
-                client.send(b"OK")
-            elif inst == b"ls":
-                folders = os.listdir()
-                client.send(" ".join(folders).encode())
-            elif inst == b"pwd":
-                client.send(os.getcwd().encode())
-            else:
-                raise CommandError("Invalid storage command")
-            
-        elif len(args) == 2:
-            inst, path = args
-            if inst == b"cd":
-                os.chdir(path.decode())
-                client.send(b"OK")
-            elif inst == b"mkdir":
-                os.mkdir(path.decode())
-                client.send(b"OK")
-            elif inst == b"rm":
-                os.remove(path.decode())
-                client.send(b"OK")
-            elif inst == b"rmdir":
-                os.rmdir(path.decode())
-                client.send(b"OK")
-            else:
-                raise CommandError("Invalid storage command")
-        
-        elif len(args) == 3:
-            inst, old, new = args
-            if inst == b"mv":
-                os.rename(old.decode(), new.decode())
-                client.send(b"OK")
-            else:
-                raise CommandError("Invalid storage command")
+@router.register(b"pwd")
+@handleException(OSError, CommandError)
+def storage_pwd(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 0:
+        path = os.getcwd()
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(path.encode())
 
-        else:
-            raise CommandError("Invalid storage command")
+@router.register(b"ls")
+@handleException(OSError, CommandError)
+def storeage_ls(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 0:
+        folders = os.listdir()
+    elif len(args) == 1:
+        folders = os.listdir(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(" ".join(folders).encode())
 
-    except OSError:
-        raise CommandError("Storage command failed")
+@router.register(b"cd")
+@handleException(OSError, CommandError)
+def storage_cd(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 0:
+        os.chdir("/")
+    elif len(args) == 1:
+        os.chdir(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")
+
+@router.register(b"stat")
+@handleException(OSError, CommandError)
+def storage_stat(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 0:
+        stat = os.stat(os.getcwd())
+    elif len(args) == 1:
+        stat = os.stat(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    data = [
+        f"mode: {hex(stat[0])}",
+        f"size: {stat[6]} B",
+    ]
+    client.send("\n".join(data).encode())
+
+@router.register(b"mv")
+@handleException(OSError, CommandError)
+def storage_mv(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 2:
+        os.rename(args[0].decode(), args[1].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")
+
+@router.register(b"cp")
+@handleException(OSError, CommandError)
+def storage_cp(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 2:
+        with open(args[0].decode(), "rb") as f:
+            with open(args[1].decode(), "wb") as g:
+                g.write(f.read())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")
+
+@router.register(b"rm")
+@handleException(OSError, CommandError)
+def storage_rm(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 1:
+        os.remove(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")
+
+@router.register(b"mkdir")
+@handleException(OSError, CommandError)
+def storage_mkdir(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 1:
+        os.mkdir(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")
+
+@router.register(b"rmdir")
+@handleException(OSError, CommandError)
+def storage_rmdir(client: Handler, command: bytes, args: list[bytes]):
+    if len(args) == 1:
+        os.rmdir(args[0].decode())
+    else:
+        raise CommandError("Invalid parameters")
+    client.send(b"OK")

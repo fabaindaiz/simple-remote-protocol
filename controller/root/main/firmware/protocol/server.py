@@ -18,7 +18,7 @@ class RemoteServer:
 
         self.socket.bind(host)
         self.socket.setblocking(False)
-        self.socket.settimeout(0.05)
+        self.socket.settimeout(0.1)
         self.socket.listen(listen)
         print("Socket listening en 8080")
 
@@ -32,4 +32,4 @@ class RemoteServer:
                 asyncio.create_task(sesion.start(client, address))
             
             except TimeoutError:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.5)
