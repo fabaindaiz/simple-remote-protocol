@@ -1,29 +1,23 @@
 import asyncio
 
 from internal.connection import WiznetConnection
-from firmware.protocol.command import Command
-from firmware.protocol.encode import Decoder
-from firmware.protocol.updater import Updater
+from firmware.protocol.mapper import CommandMapper
+from firmware.protocol.server import Server
+
+import firmware.routers.storage as storage
+import firmware.routers.system as system
+import firmware.routers.update as update
 
 
-command = Command()
-
-@command.register(b"UPLOAD")
-def upload(client, command, data):
-    try:
-        for folder, name, file in Decoder.decode_files(data):
-            print("UPLOAD", folder, name, len(file))
-        client.send(b"UPLOAD OK")
-    except:
-        client.send(b"UPLOAD ERROR")
-    
-    client.close()
+command = CommandMapper()
+command.add_router(storage.router)
+command.add_router(system.router)
+command.add_router(update.router)
 
 
 async def main(connection: WiznetConnection):
-    updater = Updater(connection, command)
-    updater.start()
+    server = Server(connection, command)
 
     while True:
-        await updater.loop()
+        await server.loop()
         await asyncio.sleep(1)

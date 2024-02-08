@@ -1,6 +1,7 @@
 import adafruit_hashlib as hashlib
 
 from internal.filesystem import ROOT
+from firmware.protocol.base import AuthError
 
 
 class Auth:
@@ -18,11 +19,11 @@ class Auth:
             file.write(value.encode())
 
     @staticmethod
-    def check(key: bytes) -> bool:
-        try:
-            value = Auth.hash(key)
-            with open(f"{ROOT}/authkey", "rb") as file:
-                auth = file.read()
-            return auth == value.encode()
-        except:
-            return False
+    def check(client) -> bool:
+        key = client.receive()
+        value = Auth.hash(key)
+        with open(f"{ROOT}/authkey", "rb") as file:
+            auth = file.read()
+        if auth != value.encode():
+            raise AuthError("Invalid key")
+        client.send(b"AUTH OK")

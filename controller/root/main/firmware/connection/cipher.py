@@ -1,9 +1,8 @@
 import os
 import aesio
 import adafruit_rsa
-import circuitpython_hmac as hmac
 
-from firmware.connection.base import SEP
+from firmware.connection.base import SecurityError, SEP
 
 
 class AESCipher:
@@ -35,12 +34,24 @@ class AESCipher:
 
 class RSACipher:
 
-    def __init__(self, public: adafruit_rsa.PublicKey):
+    def __init__(self, public: adafruit_rsa.PublicKey, private: adafruit_rsa.PrivateKey = None):
             self._public = public
+            self._private = private
     
     @property
     def public(self):
         return self._public
+    
+    @property
+    def private(self):
+        if self._private is None:
+            raise SecurityError("Private key not available")
+        return self._private
+    
+    @staticmethod
+    def load_public(public_exp: bytes) -> adafruit_rsa.PublicKey:
+        n, e = public_exp.split(SEP, 1)
+        return adafruit_rsa.PublicKey(int.from_bytes(n, 'big'), int.from_bytes(e, 'big'))
     
     @staticmethod
     def load_private(private_exp: bytes) -> adafruit_rsa.PrivateKey:
@@ -53,31 +64,8 @@ class RSACipher:
             int.from_bytes(q, 'big')
         )
     
-    @staticmethod
-    def load_public(public_exp: bytes) -> adafruit_rsa.PublicKey:
-        n, e = public_exp.split(SEP, 1)
-        return adafruit_rsa.PublicKey(int.from_bytes(n, 'big'), int.from_bytes(e, 'big'))
-    
     def encrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.encrypt(message, self.public)
-
-
-class HMACCipher:
-
-    def __init__(self, key: bytes = None):
-        self._key = key or self.generate_key()
-
-    @property
-    def key(self) -> bytes:
-        return self._key
-
-    @staticmethod
-    def generate_key(len: int = 32) -> bytes:
-        return os.urandom(len)
     
-    def sign(self, message: bytes) -> bytes:
-        return hmac.new(self.key, message).digest()
-
-    def verify(self, message: bytes, signature: bytes) -> bool:
-        return signature == self.sign(message)
-    
+    def decrypt(self, message: bytes) -> bytes:
+        return adafruit_rsa.decrypt(message, self.private)

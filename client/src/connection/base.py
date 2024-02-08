@@ -3,6 +3,11 @@ EOF = b"\r\n\r\n"
 SEP = b"\r\n"
 
 
+class ConnectionError(Exception): ...
+class ProtocolError(Exception): ...
+class SecurityError(Exception): ...
+
+
 class Handler():
 
     def receive(self) -> bytes:
