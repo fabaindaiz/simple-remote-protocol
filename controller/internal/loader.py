@@ -6,7 +6,7 @@ import internal.recovery as recovery
 
 
 def main():
-    try:
+    #try:
         connection = WiznetConnection()
         connection.connect()
 
@@ -24,6 +24,6 @@ def main():
         print("Controller started successfully!\n")
         asyncio.run(connection.supervisor())
 
-    except Exception as exception:
-        print("Exception:", exception)
-        recovery.system_recovery()
+    #except Exception as exception:
+    #    print("Exception:", exception)
+    #    recovery.system_recovery()

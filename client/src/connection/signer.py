@@ -1,7 +1,7 @@
 import os
 from cryptography.hazmat.primitives import hashes, hmac
 
-from src.connection.base import SecurityError, SEP
+from src.connection.base import SEP, SecurityError
 
 
 class HMACSigner:
@@ -14,8 +14,8 @@ class HMACSigner:
         return self._key
 
     @staticmethod
-    def generate_key(length: int = 32) -> bytes:
-        return os.urandom(length)
+    def generate_key(len: int = 32) -> bytes:
+        return os.urandom(len)
     
     def sign(self, message: bytes) -> bytes:
         h = hmac.HMAC(self.key, hashes.SHA256())
@@ -40,10 +40,10 @@ class HeaderSigner:
         count = self.counter.to_bytes(2, "big")
         length = len(message).to_bytes(2, "big")
         self.counter += 1
-        return count + SEP + length
+        return count + length
     
     def verify(self, message: bytes, signature: bytes):
-        count, length = signature.split(SEP, 1)
+        count, length = signature[:2], signature[2:]
         if int.from_bytes(count, "big") != self.counter:
             raise SecurityError("Invalid counter")
         if int.from_bytes(length, "big") != len(message):

@@ -3,7 +3,7 @@ import microcontroller
 import supervisor
 
 from firmware.connection.base import Handler, SEP
-from firmware.protocol.base import SessionEnd
+from firmware.protocol.base import SessionError
 from firmware.protocol.mapper import Router
 
 
@@ -14,7 +14,7 @@ def metrics(client: Handler, command: bytes, data: bytes):
     gc.collect()
     metrics = [
         "METRICS",
-        f"cpu uid: {microcontroller.cpu.uid}",
+        f"cpu uid: {str(microcontroller.cpu.uid)}",
         f"cpu frec: {microcontroller.cpu.frequency} Hz",
         f"cpu temp: {microcontroller.cpu.temperature} C",
         f"mem free: {gc.mem_free()} bytes",
@@ -23,5 +23,11 @@ def metrics(client: Handler, command: bytes, data: bytes):
 
 @router.register(b"reboot")
 def reboot(client: Handler, command: bytes, data: bytes):
+    print("reboot command received, rebooting device...")
+    client.send(b"Rebooting...")
     supervisor.reload()
-    raise SessionEnd("Rebooting...")
+
+@router.register(b"exit")
+def exit(client: Handler, command: bytes, data: bytes):
+    print("exit command received, closing session...")
+    raise SessionError("Session closed")

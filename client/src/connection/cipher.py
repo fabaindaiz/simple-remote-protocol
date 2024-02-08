@@ -3,7 +3,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
-from src.connection.base import SEP
+from src.connection.base import SEP, SecurityError, handleException
 
 
 class AESCipher:
@@ -16,9 +16,10 @@ class AESCipher:
         return self._key
 
     @staticmethod
-    def generate_key(length: int = 32) -> bytes:
-        return os.urandom(length)
+    def generate_key(len: int = 32) -> bytes:
+        return os.urandom(len)
 
+    @handleException(SecurityError("AES encryption failed"))
     def encrypt(self, message: bytes) -> tuple[bytes, bytes]:
         iv = self.generate_key(16)  # Para AES, IV siempre debe ser de 16 bytes para CTR.
         cipher = Cipher(algorithms.AES(self.key), modes.CTR(iv), backend=default_backend())
@@ -26,6 +27,7 @@ class AESCipher:
         ct = encryptor.update(message) + encryptor.finalize()
         return ct, iv
 
+    @handleException(SecurityError("AES decryption failed"))
     def decrypt(self, ciphertext: bytes, iv: bytes) -> bytes:
         cipher = Cipher(algorithms.AES(self.key), modes.CTR(iv), backend=default_backend())
         decryptor = cipher.decryptor()
@@ -68,8 +70,10 @@ class RSACipher:
         sizes = [256, 4, 256, 128, 128]
         return SEP.join(value.to_bytes(size, 'big') for value, size in zip(values, sizes))
 
+    #@handleException(SecurityError("RSA encryption failed"))
     def encrypt(self, message: bytes) -> bytes:
         return self.public.encrypt(message, padding.PKCS1v15())
 
+    #@handleException(SecurityError("RSA decryption failed"))
     def decrypt(self, ciphertext: bytes) -> bytes:
         return self.private.decrypt(ciphertext, padding.PKCS1v15())

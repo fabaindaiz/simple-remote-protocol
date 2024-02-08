@@ -2,10 +2,10 @@ import storage
 import supervisor
 import sys
 
-with open("root/boot", "r") as file:
+with open("/root/boot", "r") as file:
     ROOT = f"root/{file.read()}"
 
-with open("user/boot", "r") as file:
+with open("/user/boot", "r") as file:
     USER = f"user/{file.read()}"
 
 
@@ -27,11 +27,11 @@ def userspace():
     return entrypoint.main
 
 def change_rootspace(path: str):
-    with open("root/boot", "w") as file:
+    with open("/root/boot", "w") as file:
         file.write(path)
     supervisor.reload()
 
 def change_userspace(path: str):
-    with open("user/boot", "w") as file:
+    with open("/user/boot", "w") as file:
         file.write(path)
     supervisor.reload()

@@ -1,4 +1,5 @@
-from firmware.connection.base import Handler, SEP
+from firmware.connection.base import SEP, Handler
+from firmware.protocol.base import Context, CommandError
 
 
 class Router:
@@ -29,17 +30,21 @@ class CommandMapper:
         return wrapper
     
     def add_router(self, router: Router):
-        for command, func in router.commands.items():
-            self.register(command)(func)
+        for command, function in router.commands.items():
+            self.register(command)(function)
 
-    def process(self, client: Handler):
+    def process(self, client: Handler, context: Context):
         data = client.receive()
-        command, content = data.split(SEP, 1)
+        args = data.split(b" ")
+
+        if len(args) == 1:
+            command = data
+            content = b""
+        else:
+            command, content = data.split(b" ", 1)
         
-        func = self.commands.get(command, not_found)
+        if command not in self.commands:
+            raise CommandError(f"Command {command.decode()} not found")
+
+        func = self.commands.get(command)
         func(client, command, content)
-
-
-def not_found(client: Handler, command: bytes, content: bytes):
-    print(f"Command {command.decode()} not found")
-    client.send(b"Command not found")

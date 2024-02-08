@@ -8,12 +8,13 @@ from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 from microcontroller import watchdog
 from watchdog import WatchDogMode
 
-from internal.config import MY_MAC, IP_ADDRESS, SUBNET_MASK, GATEWAY_ADDRESS, DNS_SERVER
+from internal.config import IP_ADDRESS, SUBNET_MASK, GATEWAY_ADDRESS, DNS_SERVER
 
 
 class WiznetConnection:
         
     def __init__(self):
+        self.address = IP_ADDRESS
         self.ethernet = None
         self.reset = False
 
@@ -42,7 +43,7 @@ class WiznetConnection:
 
     def connect(self):
         # Initialize ethernet interface
-        self.ethernet = WIZNET5K(self.spi_bus, self.cs, is_dhcp=False, mac=MY_MAC, debug=False)
+        self.ethernet = WIZNET5K(self.spi_bus, self.cs, is_dhcp=False, debug=False)
         
         self.ethernet.ifconfig = (IP_ADDRESS, SUBNET_MASK, GATEWAY_ADDRESS, DNS_SERVER)
 

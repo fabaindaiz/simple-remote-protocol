@@ -1,4 +1,4 @@
-from src.connection.base import Handler, EOF
+from src.connection.base import EOF, Handler, TransportError, handleException
 
 
 class SocketHandler(Handler):
@@ -7,7 +7,12 @@ class SocketHandler(Handler):
         self.client = client
         self.address = address
         self.next = b''
+
+    def settimeout(self, timeout: float):
+        self.client.setblocking(False)
+        self.client.settimeout(timeout)
     
+    @handleException(TransportError("Socket receive failed"))
     def receive(self, buffer: int = 1024) -> bytes:
         data = self.next
         while True:
@@ -19,8 +24,10 @@ class SocketHandler(Handler):
             data += chunk
         return data
     
+    @handleException(TransportError("Socket send failed"))
     def send(self, data: bytes):
         self.client.send(data + EOF)
 
+    @handleException(TransportError("Socket close failed"))
     def close(self):
         self.client.close()

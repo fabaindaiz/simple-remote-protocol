@@ -1,48 +1,54 @@
-from firmware.protocol.auth import Auth
-from firmware.protocol.base import AuthError, ProtocolError, SessionEnd
-from firmware.connection.base import ConnectionError, SecurityError
+import os
+import asyncio
+
+from firmware.connection.base import Handler, ConnectionError
 from firmware.connection.secure import SecureHandler
 from firmware.connection.socket import SocketHandler
+from firmware.protocol.auth import Authentication
+from firmware.protocol.base import Context, ProtocolError, CommandError, response
+from firmware.protocol.mapper import CommandMapper
 
 
-class Sesion:
+class RemoteSession:
 
-    def __init__(self, command):
+    def __init__(self, command: CommandMapper):
         self.command = command
 
-    def loop(self, client):
-        while True:
-            try:
-                self.command.process(client)
-            
-            except ProtocolError as e:
-                client.send(b"Command error")
+    async def start(self, client, address):
+        client.settimeout(5)
 
-    async def start(self, connection, address):
         try:
             try:
-                socket = SocketHandler(connection, address)
-                client = SecureHandler(socket)
+                socket = SocketHandler(client, address)
+                secure = SecureHandler(socket)
                 print("Secure connection established")
 
-                Auth.check(client)
+                context = Authentication.authenticate(secure)
                 print("Authentification success")
                 
-                self.loop(client)
-            
-            except AuthError:
-                client.send(b"AUTH ERROR")
-                print("Connection closed: Auth error")
-            except SessionEnd:
-                client.send(b"SESSION END")
-                print("Connection closed: Session ended")
+                await self.loop(secure, context)
             
             except ConnectionError as e:
-                print("Connection closed:", e)
-            except SecurityError as e:
-                print("Connection closed:", e)
+                response(secure, f"Connection error: {e}")
+            except ProtocolError as e:
+                response(secure, f"Connection error: {e}")
             finally:
                 client.close()
-        
+
         except RuntimeError:
             print("Connection closed: Client disconnected")
+        except TimeoutError:
+            print("Connection closed: Session start timeout")
+    
+    async def loop(self, client: Handler, context: Context):
+        client.settimeout(0.05)
+        os.chdir("/")
+
+        while True:
+            try:
+                self.command.process(client, context)
+            
+            except CommandError as e:
+                response(client, f"Command error: {e}")
+            except TimeoutError:
+                await asyncio.sleep(0.01)

@@ -14,13 +14,11 @@ You will also need to install the following libraries in your board:
 #### Libraries included in the CircuitPython bundle
 - [adafruit_bus_device]()
 - [adafruit_hashlib]()
-- [adafruit_httpserver]()
 - [adafruit_io]()
 - [adafruit_itertools]()
 - [adafruit_minimqtt]()
 - [adafruit_rsa]()
 - [adafruit_wiznet5k]()
-- [adafruit_wsgi]()
 - [asyncio]()
 - [adafruit_binascii]()
 - [adafruit_dht]()

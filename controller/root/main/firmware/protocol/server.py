@@ -2,34 +2,34 @@ import asyncio
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
 
 from internal.connection import WiznetConnection
-from firmware.command.executor import CommandExecutor
-from firmware.protocol.sesion import Sesion
+from firmware.protocol.mapper import CommandMapper
+from firmware.protocol.sesion import RemoteSession
 
 
-class Server:
+class RemoteServer:
 
-    def __init__(self, connection: WiznetConnection, command: CommandExecutor):
+    def __init__(self, connection: WiznetConnection, command: CommandMapper):
         self.connection = connection
         self.command = command
     
-    def start(self, host: tuple = (None, 8080), listen: int = 1):
+    async def start(self, host: tuple = (None, 8080), listen: int = 1):
         socket.set_interface(self.connection.ethernet)
-        self.server = socket.socket()
+        self.socket = socket.socket()
 
-        self.server.bind(host)
-        self.server.setblocking(False)
-        self.server.settimeout(0.05)
-        self.server.listen(listen)
+        self.socket.bind(host)
+        self.socket.setblocking(False)
+        self.socket.settimeout(0.05)
+        self.socket.listen(listen)
         print("Socket listening en 8080")
 
     async def loop(self):
         while True:
             try:
-                socket, address = self.server.accept()
+                client, address = self.socket.accept()
                 print("Connection from", address)
 
-                sesion = Sesion(self.command)
-                asyncio.create_task(sesion.start(socket, address))
+                sesion = RemoteSession(self.command)
+                asyncio.create_task(sesion.start(client, address))
             
             except TimeoutError:
                 await asyncio.sleep(0.01)

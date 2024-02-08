@@ -1,7 +1,7 @@
 import os
 import circuitpython_hmac as hmac
 
-from firmware.connection.base import SecurityError, SEP
+from firmware.connection.base import SEP, SecurityError
 
 
 class HMACSigner:
@@ -34,12 +34,12 @@ class HeaderSigner:
         count = self.counter.to_bytes(2, "big")
         length = len(message).to_bytes(2, "big")
         self.counter += 1
-        return count + SEP + length
+        return count + length
     
     def verify(self, message: bytes, signature: bytes):
-        count, length = signature.split(SEP, 1)
+        count, length = signature[:2], signature[2:]
         if int.from_bytes(count, "big") != self.counter:
-            raise SecurityError("Invalid counter")
+            raise SecurityError("Invalid header")
         if int.from_bytes(length, "big") != len(message):
-            raise SecurityError("Invalid length")
+            raise SecurityError("Invalid header")
         self.counter += 1

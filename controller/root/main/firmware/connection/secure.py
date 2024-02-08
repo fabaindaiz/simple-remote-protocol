@@ -1,4 +1,4 @@
-from firmware.connection.base import Handler, SEP
+from firmware.connection.base import SEP, Handler, SecurityError, handleException
 from firmware.connection.cipher import AESCipher, RSACipher
 from firmware.connection.signer import HMACSigner, HeaderSigner
 
@@ -9,6 +9,9 @@ class SecureHandler(Handler):
         self.server_aes, self.client_aes, self.hmac = server_handshake(handler)
         self.header = HeaderSigner()
         self.handler = handler
+    
+    def settimeout(self, timeout: float):
+        self.handler.settimeout(timeout)
 
     def receive(self, buffer: int = 1024) -> bytes:
         data: bytes = self.handler.receive(buffer)
@@ -31,6 +34,7 @@ class SecureHandler(Handler):
         self.handler.close()
 
 
+@handleException(SecurityError("Handshake failed"))
 def server_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner]:
     client_rsa_exp = handler.receive()
     client_rsa_key = RSACipher.load_public(client_rsa_exp)

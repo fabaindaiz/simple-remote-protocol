@@ -2,7 +2,7 @@ import asyncio
 
 from internal.connection import WiznetConnection
 from firmware.protocol.mapper import CommandMapper
-from firmware.protocol.server import Server
+from firmware.protocol.server import RemoteServer
 
 import firmware.routers.storage as storage
 import firmware.routers.system as system
@@ -16,7 +16,8 @@ command.add_router(update.router)
 
 
 async def main(connection: WiznetConnection):
-    server = Server(connection, command)
+    server = RemoteServer(connection, command)
+    await server.start()
 
     while True:
         await server.loop()

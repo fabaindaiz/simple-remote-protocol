@@ -23,7 +23,6 @@ class Encoder:
             encoded = Encoder.encode_file(file, data)
             filedata.append(encoded)
 
-        start = b"FILES\r\n"
-        folder = build.encode() + SEP
+        folder = build.encode()
         bindata = SEP.join(filedata)
-        return start + folder + bindata
+        return folder + SEP + bindata

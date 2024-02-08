@@ -2,7 +2,7 @@ import os
 import aesio
 import adafruit_rsa
 
-from firmware.connection.base import SecurityError, SEP
+from firmware.connection.base import SEP, SecurityError, handleException
 
 
 class AESCipher:
@@ -18,6 +18,7 @@ class AESCipher:
     def generate_key(len: int = 32) -> bytes:
         return os.urandom(len)
 
+    #@handleException(SecurityError("AES encryption failed"))
     def encrypt(self, message: bytes) -> tuple[bytes, bytes]:
         iv = self.generate_key(16)
         output = bytearray(len(message))
@@ -25,6 +26,7 @@ class AESCipher:
         cipher.encrypt_into(message, output)
         return bytes(output), iv
 
+    @handleException(SecurityError("AES decryption failed"))
     def decrypt(self, message: bytes, iv: bytes) -> bytes:
         output = bytearray(len(message))
         cipher = aesio.AES(self.key, aesio.MODE_CTR, iv)
@@ -64,8 +66,10 @@ class RSACipher:
             int.from_bytes(q, 'big')
         )
     
+    @handleException(SecurityError("RSA encryption failed"))
     def encrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.encrypt(message, self.public)
     
+    @handleException(SecurityError("RSA decryption failed"))
     def decrypt(self, message: bytes) -> bytes:
         return adafruit_rsa.decrypt(message, self.private)
