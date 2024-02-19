@@ -8,4 +8,4 @@ router = Router()
 @router.register("exit")
 def exit(client: Handler, command: bytes, data: bytes):
     print("sending exit command, closing session...")
-    raise SessionError("Manager closed connection")
+    raise SessionError("Session closed")

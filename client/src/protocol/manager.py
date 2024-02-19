@@ -19,7 +19,7 @@ class Update:
         handler.send(data)
         response = handler.receive()
         print(response.decode())
-        raise SessionError("Manager closed connection")
+        raise SessionError("Session closed")
 
 
 class ShellManager:
