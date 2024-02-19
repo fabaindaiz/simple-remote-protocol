@@ -1,5 +1,5 @@
-from firmware.connection.base import Handler
-from firmware.protocol.base import Context, CommandError
+from src.connection.base import Handler
+from src.protocol.base import ResolveError
 
 
 class Router:
@@ -33,22 +33,21 @@ class CommandMapper:
         for command, function in router.commands.items():
             self.register(command)(function)
 
-    def process(self, client: Handler, context: Context):
-        data = client.receive()
-        if b" " in data:
-            command, content = data.split(b" ", 1)
+    def process(self, client: Handler, data: str):
+        if " " in data:
+            command, content = data.split(" ", 1)
         else:
             command = data
             content = b""
         
         if command not in self.commands:
-            raise CommandError(f"Command {command.decode()} not found")
+            raise ResolveError
 
         func = self.commands.get(command)
         func(client, command, content)
 
 
-def split_args(data: bytes):
-    if data == b"":
+def split_args(data: str):
+    if data == "":
         return []
-    return data.split(b" ")
+    return data.split(" ")

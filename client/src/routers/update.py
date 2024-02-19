@@ -1,7 +1,30 @@
 import os
 import zlib
 
-from src.connection.base import SEP
+from src.connection.base import SEP, Handler
+from src.protocol.base import CommandError, handleException
+from src.protocol.mapper import Router, split_args
+
+
+router = Router()
+
+@router.register("update")
+@handleException(OSError, CommandError)
+def update(client: Handler, command: str, data: str):
+    args = split_args(data)
+    if len(args) == 2:
+        space, build = args
+        command = b"update "
+        content = Encoder.encode_files(space.encode(), build.encode())
+        data = command + content
+        print("Uploading files...")
+
+        client.send(data)
+        response = client.receive()
+        print(response.decode())
+        return
+
+    raise CommandError("Invalid upload command")
 
 
 class Encoder:
@@ -24,8 +47,6 @@ class Encoder:
             encoded = Encoder.encode_file(path, name, data)
             filedata.append(encoded)
 
-        space = space
-        build = build
         bindata = SEP.join(filedata)
         return space + SEP + build + SEP + bindata
     

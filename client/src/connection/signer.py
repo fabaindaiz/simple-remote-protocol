@@ -36,6 +36,9 @@ class HeaderSigner:
     def __init__(self):
         self.counter = 0
 
+    def missing_message(self):
+        self.counter += 1
+
     def sign(self, message: bytes) -> bytes:
         count = self.counter.to_bytes(2, "big")
         length = len(message).to_bytes(2, "big")

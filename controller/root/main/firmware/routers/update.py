@@ -65,8 +65,8 @@ def userspace(client: Handler, command: bytes, data: bytes):
     
     raise CommandError("Invalid userspace command")
 
-@router.register(b"upload")
-def upload(client: Handler, command: bytes, data: bytes):
+@router.register(b"update")
+def update(client: Handler, command: bytes, data: bytes):
     space, build, content = data.split(SEP, 2)
 
     if not space in [b"root", b"user"]:

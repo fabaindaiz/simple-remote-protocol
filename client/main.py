@@ -1,15 +1,19 @@
 from src.protocol.client import Client
-from src.protocol.command import Command
+from src.protocol.mapper import CommandMapper
+from src.protocol.manager import ShellManager
 
-SPACE = b"user"
-BUILD = b"main2"
+import src.routers.update as update
+import src.routers.system as system
+
 HOST = ("192.168.1.220", 8080)
 
 
 if __name__ == "__main__":
-    client = Client.connect(HOST)
+    command = CommandMapper()
+    command.add_router(system.router)
+    command.add_router(update.router)
 
-    #command = Command.update(SPACE, BUILD)
-    command = Command.shell()
-
-    client.command(command)
+    manager = ShellManager(command)
+    
+    client = Client(manager)
+    client.start(HOST)

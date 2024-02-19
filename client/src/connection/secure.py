@@ -11,6 +11,9 @@ class SecureHandler(Handler):
 
     def settimeout(self, timeout: float):
         self.handler.settimeout(timeout)
+    
+    def missing_message(self):
+        return self.header.missing_message()
 
     def receive(self, buffer: int = 1024) -> bytes:
         data: bytes = self.handler.receive(buffer)

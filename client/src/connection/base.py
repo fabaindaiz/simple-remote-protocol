@@ -12,6 +12,9 @@ class Handler():
 
     def settimeout(self, timeout: float):
         raise NotImplementedError
+    
+    def missing_message(self):
+        raise NotImplementedError
 
     def receive(self) -> bytes:
         raise NotImplementedError

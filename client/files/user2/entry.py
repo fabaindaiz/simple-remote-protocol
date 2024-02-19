@@ -4,5 +4,5 @@ import asyncio
 async def main(connection):
     while True:
         print("Hello World with updates!")
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(1)
         
