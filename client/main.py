@@ -1,12 +1,15 @@
-from src.protocol.updater import Connection, Request
+from src.protocol.client import Client
+from src.protocol.command import Command
 
-SPACE = "user"
-BUILD = "second"
+SPACE = b"user"
+BUILD = b"main2"
 HOST = ("192.168.1.220", 8080)
 
 
 if __name__ == "__main__":
-    client = Connection.connect(HOST)
+    client = Client.connect(HOST)
 
-    #Request.update(client, SPACE, BUILD)
-    Request.shell(client)
+    #command = Command.update(SPACE, BUILD)
+    command = Command.shell()
+
+    client.command(command)

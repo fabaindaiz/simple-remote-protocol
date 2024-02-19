@@ -9,7 +9,8 @@ router = Router()
 
 @router.register(b"pwd")
 @handleException(OSError, CommandError)
-def storage_pwd(client: Handler, command: bytes, args: list[bytes]):
+def storage_pwd(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 0:
         path = os.getcwd()
     else:
@@ -18,7 +19,8 @@ def storage_pwd(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"ls")
 @handleException(OSError, CommandError)
-def storeage_ls(client: Handler, command: bytes, args: list[bytes]):
+def storeage_ls(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 0:
         folders = os.listdir()
     elif len(args) == 1:
@@ -29,7 +31,8 @@ def storeage_ls(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"cd")
 @handleException(OSError, CommandError)
-def storage_cd(client: Handler, command: bytes, args: list[bytes]):
+def storage_cd(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 0:
         os.chdir("/")
     elif len(args) == 1:
@@ -38,9 +41,20 @@ def storage_cd(client: Handler, command: bytes, args: list[bytes]):
         raise CommandError("Invalid parameters")
     client.send(b"OK")
 
+@router.register(b"cat")
+@handleException(OSError, CommandError)
+def storage_cat(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
+    if len(args) == 1:
+        with open(args[0].decode(), "r") as f:
+            client.send(f.read().encode())
+    else:
+        raise CommandError("Invalid parameters")
+
 @router.register(b"stat")
 @handleException(OSError, CommandError)
-def storage_stat(client: Handler, command: bytes, args: list[bytes]):
+def storage_stat(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 0:
         stat = os.stat(os.getcwd())
     elif len(args) == 1:
@@ -55,7 +69,8 @@ def storage_stat(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"mv")
 @handleException(OSError, CommandError)
-def storage_mv(client: Handler, command: bytes, args: list[bytes]):
+def storage_mv(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 2:
         os.rename(args[0].decode(), args[1].decode())
     else:
@@ -64,7 +79,8 @@ def storage_mv(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"cp")
 @handleException(OSError, CommandError)
-def storage_cp(client: Handler, command: bytes, args: list[bytes]):
+def storage_cp(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 2:
         with open(args[0].decode(), "rb") as f:
             with open(args[1].decode(), "wb") as g:
@@ -75,7 +91,8 @@ def storage_cp(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"rm")
 @handleException(OSError, CommandError)
-def storage_rm(client: Handler, command: bytes, args: list[bytes]):
+def storage_rm(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 1:
         os.remove(args[0].decode())
     else:
@@ -84,7 +101,8 @@ def storage_rm(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"mkdir")
 @handleException(OSError, CommandError)
-def storage_mkdir(client: Handler, command: bytes, args: list[bytes]):
+def storage_mkdir(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 1:
         os.mkdir(args[0].decode())
     else:
@@ -93,7 +111,8 @@ def storage_mkdir(client: Handler, command: bytes, args: list[bytes]):
 
 @router.register(b"rmdir")
 @handleException(OSError, CommandError)
-def storage_rmdir(client: Handler, command: bytes, args: list[bytes]):
+def storage_rmdir(client: Handler, command: bytes, data: bytes):
+    args = Router.split_args(data)
     if len(args) == 1:
         os.rmdir(args[0].decode())
     else:

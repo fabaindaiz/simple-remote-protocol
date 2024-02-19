@@ -6,12 +6,14 @@ from firmware.connection.signer import HMACSigner, HeaderSigner
 class SecureHandler(Handler):
 
     def __init__(self, handler: Handler):
-        self.server_aes, self.client_aes, self.hmac = server_handshake(handler)
-        self.header = HeaderSigner()
+        self.server_aes, self.client_aes, self.hmac, self.header = server_handshake(handler)
         self.handler = handler
     
     def settimeout(self, timeout: float):
         self.handler.settimeout(timeout)
+
+    def missing_message(self):
+        self.header.missing_message()
 
     def receive(self, buffer: int = 1024) -> bytes:
         data: bytes = self.handler.receive(buffer)
@@ -35,7 +37,7 @@ class SecureHandler(Handler):
 
 
 @handleException(SecurityError("Handshake failed"))
-def server_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner]:
+def server_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner, HeaderSigner]:
     client_rsa_exp = handler.receive()
     client_rsa_key = RSACipher.load_public(client_rsa_exp)
     client_rsa = RSACipher(client_rsa_key)
@@ -51,4 +53,5 @@ def server_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner
     hmac_data, hmac_iv = client_aes.encrypt(server_hmac.key)
     handler.send(hmac_data + SEP + hmac_iv)
 
-    return server_aes, client_aes, server_hmac
+    server_header = HeaderSigner()
+    return server_aes, client_aes, server_hmac, server_header

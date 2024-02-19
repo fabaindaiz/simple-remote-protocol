@@ -15,6 +15,12 @@ class Router:
             return func
         return wrapper
 
+    @staticmethod
+    def split_args(data: bytes):
+        if data == b"":
+            return []
+        return data.split(b" ")
+
 
 class CommandMapper:
 
@@ -35,17 +41,14 @@ class CommandMapper:
 
     def process(self, client: Handler, context: Context):
         data = client.receive()
-        args = data.split(b" ")
-
-        if len(args) == 1:
-            command = data
-            args = []
-        else:
+        if b" " in data:
             command, content = data.split(b" ", 1)
-            args = [arg for arg in content.split(b" ")]
+        else:
+            command = data
+            content = b""
         
         if command not in self.commands:
             raise CommandError(f"Command {command.decode()} not found")
 
         func = self.commands.get(command)
-        func(client, command, args)
+        func(client, command, content)

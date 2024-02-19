@@ -5,7 +5,7 @@ from firmware.connection.base import Handler, ConnectionError
 from firmware.connection.secure import SecureHandler
 from firmware.connection.socket import SocketHandler
 from firmware.protocol.auth import Authentication
-from firmware.protocol.base import Context, ProtocolError, CommandError, response
+from firmware.protocol.base import Context, CommandError, ProtocolError, response
 from firmware.protocol.mapper import CommandMapper
 
 
@@ -19,19 +19,19 @@ class RemoteSession:
 
         try:
             try:
-                socket = SocketHandler(client, address)
-                secure = SecureHandler(socket)
-                print("Secure connection established")
+                handler: Handler
+                handler = SocketHandler(client, address)
+                handler = SecureHandler(handler)
+                context = Authentication.authenticate(handler)
+                print("Connection established")
 
-                context = Authentication.authenticate(secure)
-                print("Authentification success")
-                
-                await self.loop(secure, context)
+                await self.loop(handler, context)
             
             except ConnectionError as e:
-                response(secure, f"Connection error: {e}")
+                handler.missing_message()
+                response(handler, f"Connection error: {e}")
             except ProtocolError as e:
-                response(secure, f"Connection error: {e}")
+                response(handler, f"Connection error: {e}")
             finally:
                 client.close()
 

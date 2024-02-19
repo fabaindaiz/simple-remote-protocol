@@ -21,9 +21,15 @@ class Authentication:
 
     @staticmethod
     def authenticate(client: Handler) -> Context:
-        value = Authentication.hash(client.receive())
-        with open(f"{ROOT}/authkey", "rb") as file:
-            if file.read() != value.encode():
-                raise AuthError("Invalid key")
-        client.send(b"AUTH OK")
+        command, content = client.receive().split(b" ", 1)
+        if command == b"AUTH":
+            value = Authentication.hash(content)
+            with open(f"{ROOT}/authkey", "rb") as file:
+                if file.read() != value.encode():
+                    raise AuthError("Invalid key")
+            client.send(b"AUTH OK")
+        elif command == b"SETKEY":
+            raise AuthError("Not implemented")
+        else:
+            raise AuthError("Invalid command")
         return Context()

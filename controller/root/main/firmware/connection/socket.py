@@ -10,6 +10,9 @@ class SocketHandler(Handler):
 
     def settimeout(self, timeout: float):
         self.client.settimeout(timeout)
+
+    def missing_message(self):
+        pass
     
     @handleException(TransportError("Socket receive failed"))
     def receive(self, buffer: int = 1024) -> bytes:

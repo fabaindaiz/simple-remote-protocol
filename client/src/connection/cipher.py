@@ -70,10 +70,10 @@ class RSACipher:
         sizes = [256, 4, 256, 128, 128]
         return SEP.join(value.to_bytes(size, 'big') for value, size in zip(values, sizes))
 
-    #@handleException(SecurityError("RSA encryption failed"))
+    @handleException(SecurityError("RSA encryption failed"))
     def encrypt(self, message: bytes) -> bytes:
         return self.public.encrypt(message, padding.PKCS1v15())
 
-    #@handleException(SecurityError("RSA decryption failed"))
+    @handleException(SecurityError("RSA decryption failed"))
     def decrypt(self, ciphertext: bytes) -> bytes:
         return self.private.decrypt(ciphertext, padding.PKCS1v15())

@@ -17,6 +17,8 @@ def system_recovery():
     try:
         with open("root/boot", "w") as file:
             file.write("main")
+        with open("user/boot", "w") as file:
+            file.write("main")
         supervisor.reload()
     except:
         print("Critical exception: firmware recovery failed.")

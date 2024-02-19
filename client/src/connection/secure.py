@@ -6,8 +6,7 @@ from src.connection.signer import HMACSigner, HeaderSigner
 class SecureHandler(Handler):
 
     def __init__(self, handler: Handler):
-        self.server_aes, self.client_aes, self.hmac = client_handshake(handler)
-        self.header = HeaderSigner()
+        self.server_aes, self.client_aes, self.hmac, self.header = client_handshake(handler)
         self.handler = handler
 
     def settimeout(self, timeout: float):
@@ -34,8 +33,8 @@ class SecureHandler(Handler):
         self.handler.close()
 
 
-handleException(SecurityError("Handshake failed"))
-def client_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner]:
+@handleException(SecurityError("Handshake failed"))
+def client_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner, HeaderSigner]:
     client_rsa = RSACipher()
     client_rsa_exp = client_rsa.save_public()
     handler.send(client_rsa_exp)
@@ -51,4 +50,5 @@ def client_handshake(handler: Handler) -> tuple[AESCipher, AESCipher, HMACSigner
     hmac_data, hmac_iv = server_hmac_enc.split(SEP, 1)
     server_hmac = HMACSigner(client_aes.decrypt(hmac_data, hmac_iv))
 
-    return server_aes, client_aes, server_hmac
+    client_header = HeaderSigner()
+    return server_aes, client_aes, server_hmac, client_header
