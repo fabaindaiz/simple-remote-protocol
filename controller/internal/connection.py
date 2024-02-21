@@ -6,7 +6,12 @@ import supervisor
 import time
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 
-from internal.config import IP_ADDRESS, SUBNET_MASK, GATEWAY_ADDRESS, DNS_SERVER
+from internal.config import CONFIG
+
+IP_ADDRESS = CONFIG.get("IP_ADDRESS")
+SUBNET_MASK = CONFIG.get("SUBNET_MASK")
+GATEWAY_ADDRESS = CONFIG.get("GATEWAY_ADDRESS")
+DNS_SERVER = CONFIG.get("DNS_SERVER")
 
 
 class WiznetConnection:
@@ -62,4 +67,4 @@ class WiznetConnection:
                 print("Ethernet disconnected!")
                 supervisor.reload()
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)

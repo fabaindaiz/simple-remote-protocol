@@ -61,11 +61,11 @@ def storage_stat(client: Handler, command: bytes, data: bytes):
         stat = os.stat(args[0].decode())
     else:
         raise CommandError("Invalid parameters")
-    data = [
+    response = [
         f"mode: {hex(stat[0])}",
-        f"size: {stat[6]} B",
+        f"size: {stat[6]} B"
     ]
-    client.send("\n".join(data).encode())
+    client.send("\n".join(response).encode())
 
 @router.register(b"mv")
 @handleException(OSError, CommandError)
@@ -83,8 +83,9 @@ def storage_cp(client: Handler, command: bytes, data: bytes):
     args = split_args(data)
     if len(args) == 2:
         with open(args[0].decode(), "rb") as f:
-            with open(args[1].decode(), "wb") as g:
-                g.write(f.read())
+            data = f.read()
+        with open(args[1].decode(), "wb") as g:
+            g.write(data)
     else:
         raise CommandError("Invalid parameters")
     client.send(b"OK")

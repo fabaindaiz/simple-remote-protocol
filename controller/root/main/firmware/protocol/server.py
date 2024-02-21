@@ -1,3 +1,4 @@
+import gc
 import asyncio
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
 
@@ -32,4 +33,5 @@ class RemoteServer:
                 asyncio.create_task(sesion.start(client, address))
             
             except TimeoutError:
-                await asyncio.sleep(0.5)
+                gc.collect()
+                await asyncio.sleep(2)

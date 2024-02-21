@@ -1,3 +1,4 @@
+import gc
 import os
 import asyncio
 
@@ -51,4 +52,5 @@ class RemoteSession:
             except CommandError as e:
                 response(client, f"Command error: {e}")
             except TimeoutError:
+                gc.collect()
                 await asyncio.sleep(0.5)

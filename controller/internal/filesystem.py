@@ -2,11 +2,15 @@ import storage
 import supervisor
 import sys
 
-with open("/root/boot", "r") as file:
-    ROOT = f"root/{file.read()}"
+from internal.memory import MEMORY, NVMDir
 
-with open("/user/boot", "r") as file:
-    USER = f"user/{file.read()}"
+
+with MEMORY as memory:
+    root = memory[NVMDir.ROOT].decode()
+    user = memory[NVMDir.USER].decode()
+
+ROOT = f"root/{root}"
+USER = f"user/{user}"
 
 
 def remount():
@@ -27,11 +31,11 @@ def userspace():
     return entrypoint.main
 
 def change_rootspace(path: str):
-    with open("/root/boot", "w") as file:
-        file.write(path)
+    with MEMORY as memory:
+        memory[NVMDir.ROOT.value] = path.encode()
     supervisor.reload()
 
 def change_userspace(path: str):
-    with open("/user/boot", "w") as file:
-        file.write(path)
+    with MEMORY as memory:
+        memory[NVMDir.USER.value] = path.encode()
     supervisor.reload()
