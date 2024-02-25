@@ -19,6 +19,6 @@ More details on [client folder](client/)
 - [CircuitPython](https://circuitpython.org/) for the firmware used in this project.
 - [Wiznet](https://www.wiznet.io/) for the W5500 ethernet module used in this project.
 
-All licenses and attributions for the libraries and redistributable files used in this project can be found in the [licences folder](licences/).
+All licenses and attributions for the libraries and redistributable files used in this project can be found in [LICENSES.md](LICENSES.md).
 
 This proyect has no relation with Adafruit, CircuitPython or Wiznet. It is an independent project made for learning purposes.
