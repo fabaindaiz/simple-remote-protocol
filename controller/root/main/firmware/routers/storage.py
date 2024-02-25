@@ -1,5 +1,4 @@
 import os
-
 from firmware.connection.base import Handler
 from firmware.protocol.base import CommandError, handleException
 from firmware.protocol.mapper import Router, split_args

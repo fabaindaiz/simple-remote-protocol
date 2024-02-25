@@ -1,8 +1,7 @@
 import storage
 import supervisor
 import usb_cdc
-
-from internal.memory import MEMORY, NVMDir
+from internal.memory import NVMController, NVM
 
 
 def secure_mode():
@@ -14,14 +13,10 @@ def secure_mode():
         print("Secure mode disabled. USB drive access allowed.")
 
 def system_recovery(exception: Exception):
-    print("Exception:", exception.with_traceback())
+    print("Exception:", exception)
     print("\nFirmware recovery mode activated.")
 
-    try:
-        with MEMORY as memory:
-            memory[NVMDir.CONFIG] = b"main.json"
-            memory[NVMDir.ROOT] = b"main"
-            memory[NVMDir.USER] = b"test"
-        supervisor.reload()
-    except:
-        print("Critical exception: firmware recovery failed.")
+    with NVMController() as memory:
+        memory[NVM.ROOT] = b"main"
+        memory[NVM.USER] = b"test"
+    supervisor.reload()

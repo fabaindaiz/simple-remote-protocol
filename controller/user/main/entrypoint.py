@@ -1,9 +1,6 @@
 import asyncio
 
-from internal.connection import WiznetConnection
-
-
-async def main(connection: WiznetConnection):
+async def main():
     while True:
         print("Hello World")
         await asyncio.sleep(1)

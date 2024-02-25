@@ -1,24 +1,23 @@
 import asyncio
-
-from internal.connection import WiznetConnection
-import internal.filesystem as filesystem
-
+from internal.filesystem import Filesystem
 
 
 def main():
-    connection = WiznetConnection()
-    connection.connect()
+    try:
+        print("Starting controller...")
+        Filesystem.remount()
 
-    print("Starting controller...")
-    filesystem.remount()
+        root = Filesystem().root()
+        asyncio.create_task(root)
+        print("Root loaded!")
 
-    root = filesystem.rootspace()
-    asyncio.create_task(root(connection))
-    print("Firmware loaded!")
+        user = Filesystem().user()
+        asyncio.run(user)
+        asyncio.create_task(user)
+        print("User loaded!")
 
-    user = filesystem.userspace()
-    asyncio.create_task(user(connection))
-    print("Entrypoint loaded!")
-
-    print("Controller started successfully!\n")
-    asyncio.run(connection.supervisor())
+        asyncio.run()
+        print("Controller started successfully!\n")
+    except Exception as exception:
+        import internal.recovery as recovery
+        recovery.system_recovery(exception)

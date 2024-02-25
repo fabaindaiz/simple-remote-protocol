@@ -1,7 +1,6 @@
 import os
 import aesio
 import adafruit_rsa
-
 from firmware.connection.base import SEP, SecurityError, handleException
 
 

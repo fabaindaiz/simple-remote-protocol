@@ -1,0 +1,6 @@
+{
+    "IP_ADDRESS": [192, 168, 100, 220],
+    "SUBNET_MASK": [255, 255, 255, 0],
+    "GATEWAY_ADDRESS": [192, 168, 100, 1],
+    "DNS_SERVER": [8, 8, 8, 8]
+}
