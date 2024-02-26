@@ -6,6 +6,12 @@ The server runs in a microcontroller running CircuitPython. This proyect is desi
 
 This projects includes a custom build of CircuitPython 8.2.10 with all the libraries used in this project and a few others as frozen modules. This reduces the RAM usage and makes it possible to run the project on a Raspberry Pi Pico. You can find the custom build in the `uf2` folder.
 
+### How to use
+
+To use this project, after flashing the custom build of CircuitPython to your board, you will need to copy the `controller/src` folder to the root of the board. You will also need to create your own `config.json` with the network configuration to be used by the microcontroller. You can use one of the `config.json` files in the folder as a reference.
+
+```python
+
 ### Dependences
 
 This project runs on [CircuitPython 8.2.10](https://circuitpython.org/), so you will need a board that supports it. The board used in this project is the [W5500-EVB-Pico](https://circuitpython.org/board/wiznet_w5500_evb_pico/). You will also need to install the following libraries in your board:
