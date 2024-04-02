@@ -1,9 +1,10 @@
 import asyncio
-from internal.filesystem import Filesystem
 
 
 def main():
     try:
+        from internal.filesystem import Filesystem
+
         print("Starting controller...")
         Filesystem.remount()
 

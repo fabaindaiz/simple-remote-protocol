@@ -33,12 +33,11 @@ class W5x00:
         return spi_bus, cs
 
 class W5x00Controller(Singleton):
+    @Singleton.init
     def __init__(self):
-        if not self._initialized:
-            reset = W5x00.reset()
-            spi_bus, cs = W5x00.SPIO()
-            self.ethernet = WIZNET5K(spi_bus, cs, is_dhcp=False, debug=False)
-            self._initialized = True
+        reset = W5x00.reset()
+        spi_bus, cs = W5x00.SPIO()
+        self.ethernet = WIZNET5K(spi_bus, cs, is_dhcp=False, debug=False)
 
         if not self.link_status:
             print("Ethernet disconnected!")
@@ -74,6 +73,8 @@ class W5x00Controller(Singleton):
         print("IP Address:", WIZNET5K.pretty_ip(self.ethernet.ip_address))
         print([WIZNET5K.pretty_ip(i) for i in self.ethernet.ifconfig])
         print("Connection successfully established!\n")
+
+        W5x00Supervisor().register()
     
 class W5x00Supervisor(Supervisor):
     def __init__(self):

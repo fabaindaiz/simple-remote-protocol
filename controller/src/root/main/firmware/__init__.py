@@ -12,7 +12,7 @@ command.add_router(storage.router)
 command.add_router(system.router)
 command.add_router(update.router)
 
-config = ((192, 168, 100, 120), (255, 255, 255, 0), (192, 168, 100, 1), (8, 8, 8, 8))
+config = ((192, 168, 1, 220), (255, 255, 255, 0), (192, 168, 1, 1), (8, 8, 8, 8))
 connection = W5x00Controller()
 connection.connect(config)
 server = RemoteServer(connection, command)

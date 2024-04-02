@@ -1,7 +1,7 @@
 import storage
 import supervisor
 import sys
-from internal.memory import NVMController, NVM
+from internal.service.memory import NVMController, NVM
 from internal.utils import Singleton
 
 

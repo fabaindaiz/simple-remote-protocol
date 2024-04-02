@@ -20,17 +20,16 @@ class NVMValue:
         return data[1:size+1]
 
 class NVMController(Singleton):
+    @Singleton.init
     def __init__(self, padding: int = 32) -> None:
         if microcontroller.nvm is None:
             raise ImportError("NVM not supported")
-        if not self._initialized:
-            self._mem_size = len(microcontroller.nvm)
-            self._gap_num = self._mem_size // padding
-            self._gap_size = padding
-            
-            self._memory = None
-            self._changed = False
-            self._initialized = True
+        self._mem_size = len(microcontroller.nvm)
+        self._gap_num = self._mem_size // padding
+        self._gap_size = padding
+        
+        self._memory = None
+        self._changed = False
 
     @property
     def memory(self):
