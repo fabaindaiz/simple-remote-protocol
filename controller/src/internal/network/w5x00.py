@@ -32,8 +32,7 @@ class W5x00:
         spi_bus = busio.SPI(SPI0_SCK, MOSI=SPI0_TX, MISO=SPI0_RX)
         return spi_bus, cs
 
-class W5x00Controller(Singleton):
-    @Singleton.init
+class W5x00Controller:
     def __init__(self):
         reset = W5x00.reset()
         spi_bus, cs = W5x00.SPIO()
