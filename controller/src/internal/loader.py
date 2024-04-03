@@ -1,23 +1,23 @@
 import asyncio
+from internal.filesystem import Filesystem
 
+async def loop():
+    while True:
+        asyncio.sleep(1)
 
 def main():
     try:
-        from internal.filesystem import Filesystem
-
         print("Starting controller...")
-        Filesystem.remount()
 
         root = Filesystem().root()
         asyncio.create_task(root)
         print("Root loaded!")
 
         user = Filesystem().user()
-        asyncio.run(user)
         asyncio.create_task(user)
         print("User loaded!")
 
-        asyncio.run()
+        asyncio.run(loop)
         print("Controller started successfully!\n")
     except Exception as exception:
         import internal.recovery as recovery

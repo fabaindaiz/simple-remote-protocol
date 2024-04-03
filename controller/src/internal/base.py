@@ -1,5 +1,3 @@
-import asyncio
-
 
 class Singleton(type):
     _instance = None
@@ -15,13 +13,5 @@ class Singleton(type):
         def wrapper(self, *args, **kwargs):
             if not self._initialized:
                 self._initialized = True
-                func(self, *args, **kwargs)
+                return func(self, *args, **kwargs)
         return wrapper
-
-class Supervisor:
-
-    async def supervisor(self):
-        raise NotImplementedError
-
-    def register(self):
-        asyncio.create_task(self.supervisor())

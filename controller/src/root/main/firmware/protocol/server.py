@@ -14,16 +14,17 @@ class RemoteServer:
         self.command = command
     
     async def start(self, host: tuple = (None, 8080), listen: int = 1):
-        #socket.set_interface(self.connection.ethernet)
-        #self.socket = socket.socket()
+        socket.set_interface(self.connection.ethernet)
+        self.socket = socket.socket()
 
-        #self.socket.bind(host)
-        #self.socket.setblocking(False)
-        #self.socket.settimeout(0.1)
-        #self.socket.listen(listen)
+        self.socket.bind(host)
+        self.socket.setblocking(False)
+        self.socket.settimeout(0.1)
+        self.socket.listen(listen)
         print("Socket listening en 8080")
         print(self.connection.ethernet.pretty_ip(self.connection.ethernet.ip_address))
 
+    async def start_web(self):
         server = Server(socket)
         @server.route("/")#, append_slash=True)
         def cpu_information_handler(request: Request):

@@ -1,2 +1,2 @@
-import internal.loader as loader
-loader.main()
+from internal.loader import Loader
+Loader().main()

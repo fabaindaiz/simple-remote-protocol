@@ -1,5 +1,5 @@
 import microcontroller
-from internal.utils import Singleton
+from internal.base import Singleton
 
 
 class NVM:

@@ -1,8 +1,8 @@
 import os
-from internal.utils import Singleton, Supervisor
+from internal.base import Singleton
+from internal.network.base import NetworkController
 
-
-class NetworkController(Singleton):
+class NetworkLoader(Singleton):
     @Singleton.init
     def __init__(self):
         self._network = None
@@ -13,3 +13,7 @@ class NetworkController(Singleton):
             self._network = W5x00Controller()
         else:
             raise RuntimeError(f"Unsupported network controller: {network}")
+    
+    @property
+    def network(self) -> NetworkController:
+        return self._network
