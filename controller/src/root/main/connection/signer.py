@@ -1,11 +1,8 @@
 import os
 import circuitpython_hmac as hmac
-
-from firmware.connection.base import SEP, SecurityError
-
+from ..connection.base import SEP, SecurityError
 
 class HMACSigner:
-
     def __init__(self, key: bytes = None):
         self.key = key or self.generate_key()
 
@@ -20,9 +17,7 @@ class HMACSigner:
         if signature != self.sign(message):
             raise SecurityError("Invalid HMAC")
 
-
 class HeaderSigner:
-
     def __init__(self):
         self.counter = 0
     

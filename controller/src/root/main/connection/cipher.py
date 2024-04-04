@@ -1,11 +1,9 @@
 import os
 import aesio
 import adafruit_rsa
-from firmware.connection.base import SEP, SecurityError, handleException
-
+from ..connection.base import SEP, SecurityError, handleException
 
 class AESCipher:
-
     def __init__(self, key: bytes = None):
         self._key = key or self.generate_key()
 
@@ -32,9 +30,7 @@ class AESCipher:
         cipher.decrypt_into(message, output)
         return bytes(output)
 
-
 class RSACipher:
-
     def __init__(self, public: adafruit_rsa.PublicKey, private: adafruit_rsa.PrivateKey = None):
             self._public = public
             self._private = private

@@ -1,15 +1,12 @@
-from firmware.connection.base import Handler
-
+from ..connection.base import Handler
 
 EOF = b"\r\n\r\n"
 SEP = b"\r\n"
-
 
 class ProtocolError(Exception): ...
 class AuthError(ProtocolError): ...
 class CommandError(ProtocolError): ...
 class SessionError(ProtocolError): ...
-
 
 class Context:
     pass

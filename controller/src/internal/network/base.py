@@ -1,19 +1,16 @@
-import asyncio
 
 class NetworkController:
     @property
     def link_status(self) -> bool:
-        return NotImplementedError
+        raise NotImplementedError
     
     @property
-    def socket(self) -> tuple:
-        return NotImplementedError
+    def socket(self):
+        raise NotImplementedError
     
-    def connect(self, ifconfig: tuple, mac_address: bytes):
-        return NotImplementedError
+    @property
+    def interface(self):
+        raise NotImplementedError
     
-    async def supervisor(self):
-        return NotImplementedError
-    
-    def start_supervisor(self):
-        asyncio.create_task(self.supervisor())
+    def debug_info():
+        raise NotImplementedError

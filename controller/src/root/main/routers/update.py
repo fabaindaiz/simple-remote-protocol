@@ -1,11 +1,9 @@
 import os
 import zlib
-
-from internal.filesystem import Filesystem
-from firmware.connection.base import SEP, Handler
-from firmware.protocol.base import CommandError, handleException
-from firmware.protocol.mapper import Router, split_args
-
+from internal.storage import StorageController
+from ..connection.base import SEP, Handler
+from ..protocol.base import CommandError, handleException
+from ..protocol.mapper import Router, split_args
 
 router = Router()
 
@@ -25,7 +23,7 @@ def rootspace(client: Handler, command: bytes, data: bytes):
         space = path.decode()
         if inst == b"change":
             if space in os.listdir("/root") and space not in ["boot"]:
-                Filesystem().root = space
+                StorageController().root = space
                 client.send(b"rootspace changed")
                 return
 
@@ -53,7 +51,7 @@ def userspace(client: Handler, command: bytes, data: bytes):
         space = path.decode()
         if inst == b"change":
             if space in os.listdir("/user") and space not in ["boot"]:
-                Filesystem().user = space
+                StorageController().user = space
                 client.send(b"Userspace changed")
                 return
 

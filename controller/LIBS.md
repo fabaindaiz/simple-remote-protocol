@@ -4,16 +4,15 @@ This project includes some libraries that are not built-in in CircuitPython.
 
 Library | Version
 --- | ---
-adafruit_bus_device | 5.2.8
 adafruit_hashlib | 1.4.15
-adafruit_io | 5.8.1
-adafruit_minimqtt | 7.5.8
-adafruit_rsa | 1.2.19
-adafruit_wiznet5k | 5.0.6
-asyncio | 1.3.0
+adafruit_io | 5.8.2
+adafruit_minimqtt | 7.6.3
+adafruit_rsa | 1.2.21
+adafruit_wiznet5k | 5.0.9
+asyncio | 1.3.1
 adafruit_binascii | 2.0.3
 adafruit_logging | 5.2.5
-adafruit_requests | 2.0.5
+adafruit_requests | 3.2.3
 adafruit_ticks | 1.0.13
 circuitpython_hmac | 0.2.1
 

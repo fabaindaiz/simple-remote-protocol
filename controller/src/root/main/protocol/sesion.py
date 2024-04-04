@@ -1,17 +1,14 @@
+import asyncio
 import gc
 import os
-import asyncio
-
-from firmware.connection.base import Handler, ConnectionError
-from firmware.connection.secure import SecureHandler
-from firmware.connection.socket import SocketHandler
-from firmware.protocol.auth import Authentication
-from firmware.protocol.base import Context, CommandError, ProtocolError, response
-from firmware.protocol.mapper import CommandMapper
-
+from ..connection.base import Handler, ConnectionError
+from ..connection.secure import SecureHandler
+from ..connection.socket import SocketHandler
+from ..protocol.auth import Authentication
+from ..protocol.base import Context, CommandError, ProtocolError, response
+from ..protocol.mapper import CommandMapper
 
 class RemoteSession:
-
     def __init__(self, command: CommandMapper):
         self.command = command
 

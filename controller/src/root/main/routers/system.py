@@ -2,11 +2,9 @@ import gc
 import os
 import microcontroller
 import supervisor
-
-from firmware.connection.base import Handler
-from firmware.protocol.base import SessionError
-from firmware.protocol.mapper import Router
-
+from ..connection.base import Handler
+from ..protocol.base import SessionError
+from ..protocol.mapper import Router
 
 router = Router()
 

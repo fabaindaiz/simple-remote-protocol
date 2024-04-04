@@ -1,9 +1,7 @@
-from firmware.connection.base import Handler
-from firmware.protocol.base import Context, CommandError
-
+from ..connection.base import Handler
+from ..protocol.base import Context, CommandError
 
 class Router:
-
     def __init__(self) -> None:
         self.commands = {}
 
@@ -15,9 +13,7 @@ class Router:
             return func
         return wrapper
 
-
 class CommandMapper:
-
     def __init__(self) -> None:
         self.commands = {}
 
@@ -46,7 +42,6 @@ class CommandMapper:
 
         func = self.commands.get(command)
         func(client, command, content)
-
 
 def split_args(data: bytes):
     if data == b"":

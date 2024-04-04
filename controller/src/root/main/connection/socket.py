@@ -1,8 +1,6 @@
-from firmware.connection.base import EOF, Handler, TransportError, handleException
-
+from ..connection.base import EOF, Handler, TransportError, handleException
 
 class SocketHandler(Handler):
-
     def __init__(self, client, address: tuple) -> None:
         self.client = client
         self.address = address

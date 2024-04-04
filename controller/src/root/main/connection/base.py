@@ -1,15 +1,11 @@
-
 EOF = b"\r\n\r\n"
 SEP = b"\r\n"
-
 
 class ConnectionError(Exception): ...
 class SecurityError(ConnectionError): ...
 class TransportError(ConnectionError): ...
 
-
 class Handler():
-
     def settimeout(self, timeout: float):
         raise NotImplementedError
     
@@ -24,7 +20,6 @@ class Handler():
     
     def close(self):
         raise NotImplementedError
-
 
 def handleException(exception: ConnectionError):
     def wrapper(func):

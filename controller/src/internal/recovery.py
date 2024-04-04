@@ -1,8 +1,7 @@
 import storage
 import supervisor
 import usb_cdc
-from internal.service.memory import NVMController, NVM
-
+from internal.memory import NVMController, NVM
 
 def secure_mode():
     try:
