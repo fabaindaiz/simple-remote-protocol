@@ -5,11 +5,11 @@ class NetworkController:
         raise NotImplementedError
     
     @property
-    def socket(self):
+    def interface(self):
         raise NotImplementedError
     
     @property
-    def interface(self):
+    def socket(self):
         raise NotImplementedError
     
     def debug_info():

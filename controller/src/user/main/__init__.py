@@ -5,4 +5,3 @@ async def main():
         print("Hello World")
         await asyncio.sleep(1)
 
-asyncio.run(main())

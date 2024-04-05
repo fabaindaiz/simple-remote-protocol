@@ -33,6 +33,9 @@ class W5x00Controller(NetworkController):
         reset = W5x00.reset()
         spi_bus, cs = W5x00.SPIO()
         self.ethernet = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=mac_address, debug=debug)
+
+        if not self.link_status:
+            raise RuntimeError("Ethernet disconnected!")
     
     def connect(self, ifconfig: tuple, mac_address: bytes=_DEFAULT_MAC, is_dhcp: bool=True):
         self.ethernet.mac_address = mac_address
@@ -51,13 +54,13 @@ class W5x00Controller(NetworkController):
         return self.ethernet.link_status
     
     @property
+    def interface(self):
+        return self.ethernet
+    
+    @property
     def socket(self):
         socket.set_interface(self.ethernet)
         return socket
-    
-    @property
-    def interface(self):
-        return self.ethernet
 
     def debug_info(self):
         print("Chip Version:", self.ethernet.chip)

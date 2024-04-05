@@ -1,7 +1,6 @@
 import microcontroller
 from internal.base import Singleton
 
-
 class NVM:
     ROOT = 4
     USER = 5

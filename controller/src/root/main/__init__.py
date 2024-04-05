@@ -20,5 +20,3 @@ async def main():
     while True:
         await server.loop()
         await asyncio.sleep(1)
-
-asyncio.run(main())

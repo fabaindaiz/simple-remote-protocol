@@ -1,4 +1,5 @@
 import os
+import time
 import asyncio
 import supervisor
 from internal.base import Singleton
@@ -11,12 +12,17 @@ class NetworkLoader(Singleton):
 
         network = os.getenv("NETWORK", "WIZNET5K")
         if network == "WIZNET5K":
-            from internal.network.w5x00 import W5x00Controller
-            self._network = W5x00Controller()
-            self.start_supervisor()
-            
-            ifconfig = ((192, 168, 1, 220), (255, 255, 255, 0), (192, 168, 1, 1), (8, 8, 8, 8))
-            self._network.connect(ifconfig, is_dhcp=False)
+            try:
+                from internal.network.w5x00 import W5x00Controller
+                self._network = W5x00Controller()
+                self.start_supervisor()
+                
+                ifconfig = ((192, 168, 1, 220), (255, 255, 255, 0), (192, 168, 1, 1), (8, 8, 8, 8))
+                self._network.connect(ifconfig, is_dhcp=False)
+            except RuntimeError as e:
+                print(e)
+                time.sleep(1)
+                supervisor.reload()
         else:
             raise RuntimeError(f"Unsupported network controller: {network}")
     

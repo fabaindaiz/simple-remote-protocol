@@ -2,9 +2,9 @@
 
 The server runs in a microcontroller running CircuitPython. This proyect is designed to run on a raspberry pi pico with a Wiznet W5500 ethernet module. But it can be easily adapted to run on other microcontrollers since it uses the `socket` module to communicate with the client.
 
-### CircuitPython 8.2.10
+### CircuitPython 9.0.3
 
-This projects includes a custom build of CircuitPython 8.2.10 with all the libraries used in this project and a few others as frozen modules. This reduces the RAM usage and makes it possible to run the project on a Raspberry Pi Pico. You can find the custom build in the `uf2` folder.
+This projects includes a custom build of CircuitPython 9.0.3 with all the libraries used in this project and a few others as frozen modules. This reduces the RAM usage and makes it possible to run the project on a Raspberry Pi Pico. You can find the custom build in the `uf2` folder.
 
 ### How to use
 
@@ -14,7 +14,7 @@ To use this project, after flashing the custom build of CircuitPython to your bo
 
 ### Dependences
 
-This project runs on [CircuitPython 8.2.10](https://circuitpython.org/), so you will need a board that supports it. The board used in this project is the [W5500-EVB-Pico](https://circuitpython.org/board/wiznet_w5500_evb_pico/). You will also need to install the following libraries in your board:
+This project runs on [CircuitPython 9.0.3](https://circuitpython.org/), so you will need a board that supports it. The board used in this project is the [W5500-EVB-Pico](https://circuitpython.org/board/wiznet_w5500_evb_pico/). You will also need to install the following libraries in your board:
 
 - [adafruit_bus_device](https://github.com/adafruit/Adafruit_CircuitPython_BusDevice)
 - [adafruit_hashlib](https://github.com/adafruit/Adafruit_CircuitPython_hashlib)
@@ -35,6 +35,6 @@ Libraries used in this project are ram consuming, so you will need a board with 
 
 ### Custom Build
 
-This project includes a custom build of CircuitPython 8.2.10 with all the libraries used in this project and a few others as frozen modules. You can flash the custom build to your board using the `frozenlibs-circuitpython-w5500_evb_pico-8.2.10.uf2` file in the `uf2` folder. This build is designed to run only on the W5500-EVB-Pico board.
+This project includes a custom build of CircuitPython 9.0.3 with all the libraries used in this project and a few others as frozen modules. You can flash the custom build to your board using the `frozenlibs-circuitpython-w5500_evb_pico-9.0.3.uf2` file in the `uf2` folder. This build is designed to run only on the W5500-EVB-Pico board.
 
 If you want to build your own custom build of CircuitPython with other libraries or for other boards, you can use the `frozenlibs-build.sh` file in the `uf2` folder as a reference. This command is not prepared to be run as is, you will need to modify it to fit your needs.

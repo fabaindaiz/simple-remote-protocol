@@ -8,7 +8,7 @@ class StorageController(Singleton):
         with NVMController() as memory:
             self.ROOT = f"root/{memory[NVM.ROOT].decode()}"
             self.USER = f"user/{memory[NVM.USER].decode()}"
-        self.remount()
+        #self.remount()
 
     @staticmethod
     def remount():
